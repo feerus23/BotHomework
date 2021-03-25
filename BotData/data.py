@@ -158,9 +158,12 @@ class Users:
 class Schedule:
     'Класс для работы с расписанием'
 
-    dow_standard = [ i for i in range(1,8) ]
-    dow = []
+    standart = [ i for i in range(1,7) ]
+    aRes = [ None for i in range(1,8) ]
     res = []
+    dow = []
+
+    difference = False
 
     def __tfDowSQL(self, string):
         return {
@@ -179,13 +182,13 @@ class Schedule:
             self.dow = [ day_of_week ]
         elif type(day_of_week) == list:
             for day in day_of_week:
-                if not (day in self.dow_standard):
+                if not (day in self.standart):
                     if not (day := self.__tfDowSQL(day)):
                         break
                 self.dow.append(day)
 
             if len(self.dow) != len(day_of_week): 
-                pass
+                return 
         
             for day in self.dow:
                 curs.execute('SELECT * FROM schedule WHERE day_of_week = ?', (day,))
@@ -200,3 +203,38 @@ class Schedule:
     
     def getRes(self):
         return self.res
+
+    def getLesson(self, lessons = standart):
+        'Функция возвращающая названия уроков списком.'
+        if type(lessons) == int: lessons = [ lessons ]
+
+        les_names = []
+
+        for i in range(0, len(lessons)):
+            try:
+                tvar = self.res[lessons[i]]
+            except IndexError:
+                les_names.append(str(i+1) + ') Нет данных')
+            else:
+                if not tvar:
+                    les_names.append(str(i+1) + ') Нет данных')
+                else:
+                    les_names.append(str(i+1) + ') ' + tvar)
+        
+        return les_names
+    
+    def getELesson(self, lessons = standart):
+        pass
+    
+    def setLesson(self, lesson_number, name):
+        self.aRes[lesson_number] = name
+    
+    def compare(self):
+        if len(self.res) != len(self.aRes): return False
+
+        for i in range(1, len(self.res)+1):
+            if self.aRes[i] != self.res[i] and self.aRes[i] != None:
+                self.difference = True
+                break
+    
+        return self.difference
