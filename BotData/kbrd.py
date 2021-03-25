@@ -16,3 +16,9 @@ def main_menu():
         .add(Callback('Администраторская панель', {'cmd': 'admin_menu'}), KeyboardButtonColor.PRIMARY)
         .get_json()
     )
+
+def schedule_menu():
+    return (
+        Keyboard(one_time = True)
+        .add(Text('Изменить расписание'))
+    )
