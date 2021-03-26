@@ -82,10 +82,12 @@ class Title:
             return False, 'Нет звания к такому уровню доступа.'
 
 class Users:
-    'Class for registration users information'
+    'Класс для обработки пользовательских данных'
 
     Prm = {}
     tparams = { 'user_id': 0, 'permission': 1, 'grade': 2 }
+
+    __Vars = {}
 
     __empty_list = [(1, None), (2, None)]
 
@@ -155,6 +157,21 @@ class Users:
         curs.execute(query, values)
         con.commit()
 
+    def vSet(self, **kwargs):
+        for k, v in kwargs.items():
+            self.__Vars.update([(k, v)])
+    
+    def vGet(self, *args):
+        retvals = ()
+
+        if len(args) == 1:
+            return self.__Vars.get(args[0], None)
+
+        for v in args:
+            retvals += (self.__Vars.get(v, None),)
+
+        return retvals
+
 class Schedule:
     'Класс для работы с расписанием'
 
@@ -189,7 +206,7 @@ class Schedule:
 
             if len(self.dow) != len(day_of_week): 
                 return 
-        
+
             for day in self.dow:
                 curs.execute('SELECT * FROM schedule WHERE day_of_week = ?', (day,))
                 if ftch := curs.fetchone():
@@ -204,7 +221,7 @@ class Schedule:
     def getRes(self):
         return self.res
 
-    def getLesson(self, lessons = standart):
+    def getLesson(self, lessons = standart, day_of_week = dow):
         'Функция возвращающая названия уроков списком.'
         if type(lessons) == int: lessons = [ lessons ]
 
@@ -238,3 +255,6 @@ class Schedule:
                 break
     
         return self.difference
+    
+    def getDow(self):
+        return self.dow

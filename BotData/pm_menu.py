@@ -1,4 +1,4 @@
-from vkbottle import BaseStateGroup, Keyboard, Text, BaseMiddleware, CtxStorage
+from vkbottle import BaseStateGroup, Keyboard, Text, BaseMiddleware
 from vkbottle.bot import Blueprint, Message
 from vkbottle_types.objects import UsersUserXtrCounters
 
@@ -7,9 +7,9 @@ import re
 from . import data, kbrd
 
 users = {}
+lesnum = int()
 
 bp = Blueprint()
-tdb = CtxStorage()
 
 SCHEDULE_STANDART = [ i for i in range(1,7) ]
 
@@ -68,10 +68,10 @@ async def sedit_handler(message: Message):
 async def cws_handler(message: Message):
     tstr = ''
 
-    schedule = tdb.get(message.peer_id)
+    schedule = users[message.peer_id].vGet('sobj')
     if schedule is None:
-        tdb.set(message.peer_id, data.Schedule(message.text.lower()))
-        schedule = tdb.get(message.peer_id)
+        users[message.peer_id].vSet(sobj=data.Schedule(message.text.lower()))
+        schedule = users[message.peer_id].vGet('sobj')
 
     await message.answer(message.text)
     for les in schedule.getLesson(SCHEDULE_STANDART):
@@ -88,16 +88,23 @@ async def cws_handler(message: Message):
 
 @bp.on.private_message(state=stateMenu.CWS, payload={'cmd': 'cls_menu'})
 async def cls_handler(message: Message):
-    schedule = tdb.get(message.peer_id)
+    schedule = users[message.peer_id].vGet('sobj')
     lesnum = int(re.search(r'\d', message.text)[0])
 
-    await message.answer(f'Вы выбрали урок {schedule.getLesson(lesnum)[0]}.\n Введите название урока на который хотите заменить этот урок.')
+    await message.answer(f'Вы выбрали урок {schedule.getLesson(lesnum)[0]}.\n Введите название урока на который хотите заменить этот урок.', keyboard=kbrd.undo_button())
 
     if schedule.compare():
         await message.andwer(f'Также ваши не сохранённые изменения: {lesnum}')
     
     await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.CLS)
 
+@bp.on.private_message(state=stateMenu.CLS)
+async def lesed_handler(message: Message):
+    schedule = users[message.peer_id].vGet('sobj')
+    schedule.setLesson(lesnum, message.text)
+
+    await cws_handler(schedule.getDow())
+    await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.SCHEDULE)
 
 @bp.on.private_message(payload={'cmd': 'undo'})
 async def undo_handler(message: Message):
