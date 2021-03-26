@@ -158,8 +158,18 @@ class Users:
         con.commit()
 
     def vSet(self, **kwargs):
+        updates = ()
+
+        if len(kwargs) == 1:
+            k, v = list(kwargs.items())[0]
+            self.__Vars.update([(k, v)])
+            return v
+            
         for k, v in kwargs.items():
             self.__Vars.update([(k, v)])
+            updates += (v, )
+        
+        return updates
     
     def vGet(self, *args):
         retvals = ()
