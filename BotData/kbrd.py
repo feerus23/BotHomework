@@ -75,3 +75,10 @@ def cls_menu_apply():
         .add(Text('Назад', {'cmd': 'undo'}), KeyboardButtonColor.PRIMARY)
         .get_json()
     )
+
+def undo_button():
+    return (
+        Keyboard(one_time = True)
+        .add(Text('Назад', {'cmd': 'undo'}), KeyboardButtonColor.PRIMARY)
+        .get_json()
+    )
