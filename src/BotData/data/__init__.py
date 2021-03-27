@@ -1,4 +1,5 @@
-from . import Users, Schedule, Titles, data
+from . import Users, Schedule, Titles
+from .data import *
 
 ORIGINAL = Schedule.ORIGINAL
 MODIFIED = Schedule.MODIFIED
