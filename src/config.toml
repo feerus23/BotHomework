@@ -1,0 +1,8 @@
+[auth_data]
+token = YOUR_TOKEN
+
+[admins_id]
+0 = YOUR_ACCOUNT_ID
+
+[admin]
+min = MINIMAL_ADMIN_LEVEL
