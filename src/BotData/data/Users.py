@@ -19,21 +19,21 @@ class Users:
                 self.Prm.update([(1, res[0]), (2, res[1])])
             else:
                 if user_id in admin:
-                    self.Prm.update([(1, 0), (2, '10b')])
+                    self.Prm.update([(1, 0), (2, '10б')])
                 else:
                     self.Prm.update(self.__empty_list)
         else:
             if user_id in admin:
-                self.Prm.update([(1, 0), (2, '10b')])
+                self.Prm.update([(1, 0), (2, '10б')])
             else:
                 self.Prm.update(self.__empty_list)
 
-    def setParam(self, param, value):
+    def pSet(self, param, value):
         if type(param) == str:
             param = self.tparams[param]
         self.Prm[param] = value
     
-    def getParam(self, param):
+    def pGet(self, param):
         if type(param) == str:
             param = self.tparams[param]
         try:
@@ -56,7 +56,7 @@ class Users:
     def createUser(self, **kwargs):
         'Создаёт новую строку в таблице. Имена столбцов и их значения указываются в **kwargs'
         query = 'INSERT INTO users '
-        columns = '(user_id, '; values = (); values_str = ' (?, '; cunt = 0
+        columns = '(id, '; values = (); values_str = ' (?, '; cunt = 0
 
         for k, v in kwargs.items():
             cunt +=1

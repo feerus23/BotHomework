@@ -8,8 +8,8 @@ bp = Blueprint()
 
 usr = {}
 
-async def GetUInfo(user_id):
-    return (await bp.api.users.get(user_id))[0]
+async def GetUInfo(user_id, fields=None, name_case=None):
+    return (await bp.api.users.get(user_id, fields, name_case))[0]
 
 async def resetData(id):
     del usr[id]
@@ -35,18 +35,19 @@ class stateMenu(BaseStateGroup):
 
     ADMIN_ADD_1 = 10
     ADMIN_ADD_2 = 11
+    ADMIN_ADD_3 = 12
 
 @bp.on.private_message(state=None)
 async def begin_handler(message: Message):  
     usr.update([(message.peer_id, data.Users(message.peer_id))])
 
     info = await GetUInfo(message.from_id)
-    if title := data.Title().Get(usr[message.peer_id].getParam(1)):
+    if title := data.Title().Get(usr[message.peer_id].pGet(1)):
         msg = f'Рад вас видеть в добром здравии, товарищ {title}, {info.last_name}.'
     else:
         msg = 'Рад вас видеть в добром здравии, товарищ!'
 
-    if usr[message.peer_id].getParam(0):
+    if usr[message.peer_id].pGet(0):
         await message.answer(msg, keyboard = keyboard.begin_menu())
         await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN)
     else:
@@ -56,4 +57,8 @@ async def begin_handler(message: Message):
 
 @bp.on.private_message(state=stateMenu.BEGIN, payload={'cmd': 'main_menu'})
 async def main_handler(message: Message):
-    await message.answer('Чего изволите товарищ?', keyboard=keyboard.main_menu())
+    if data.isAdmin(usr[message.peer_id].pGet(1)):
+        await message.answer('Чего изволите товарищ?', keyboard=keyboard.main_menu('admin'))
+    else:
+        await message.answer('Чего изволите товарищ?', keyboard=keyboard.main_menu())
+    

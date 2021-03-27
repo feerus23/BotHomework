@@ -1,7 +1,8 @@
 import sqlite3 as sql
 import toml
 
-tvar = toml.load('config.toml')['admins_id']; admin = []
+cfg = toml.load('config.toml')
+tvar = cfg['admins_id']; admin = []
 for _, v in tvar.items(): admin.append(v)
 del tvar
 
@@ -51,3 +52,9 @@ def checkDatabase():
         return False
     else:
         return True
+
+def isAdmin(perm):
+    if perm >= cfg['admin']['min'] or perm == 0:
+        return True
+    else:
+        return False
