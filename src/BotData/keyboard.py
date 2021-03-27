@@ -1,5 +1,6 @@
 from vkbottle import Keyboard, Text, Callback, KeyboardButtonColor
 
+#main_tree
 def begin_menu():
     return (
         Keyboard(one_time = True)
@@ -13,16 +14,17 @@ def main_menu():
         .add(Text('Расписание', {'cmd': 'sedit_menu'}))
         .add(Text('Домашнее задание', {'cmd': 'homework_menu'}))
         .row()
-        .add(Callback('Администраторская панель', {'cmd': 'admin_menu'}), KeyboardButtonColor.NEGATIVE)
+        .add(Text('Администраторская панель', {'cmd': 'admin_menu'}), KeyboardButtonColor.POSITIVE)
         .get_json()
     )
 
+#schedule_tree
 def schedule_menu():
     return (
         Keyboard(one_time = True)
         .add(Text('Изменить расписание', {'cmd': 'sedit_menu'}))
         .row()
-        .add(Text('Назад', {'cmd': 'undo'}), KeyboardButtonColor.PRIMARY)
+        .add(Text('Назад', {'cmd': 'undo_schedule'}), KeyboardButtonColor.PRIMARY)
         .get_json()
     )
 
@@ -38,7 +40,7 @@ def sedit_menu():
         .row()
         .add(Text('Суббота', {'cmd': 'cws_menu'}))
         .row()
-        .add(Text('Назад', {'cmd': 'undo'}), KeyboardButtonColor.PRIMARY)
+        .add(Text('Назад', {'cmd': 'undo_schedule'}), KeyboardButtonColor.PRIMARY)
         .get_json()
     )
 
@@ -54,7 +56,7 @@ def cls_menu():
         .add(Text('5 урок', {'cmd': 'cls_menu'}))
         .add(Text('6 урок', {'cmd': 'cls_menu'}))
         .row()
-        .add(Text('Назад', {'cmd': 'undo'}), KeyboardButtonColor.PRIMARY)
+        .add(Text('Назад', {'cmd': 'undo_schedule'}), KeyboardButtonColor.PRIMARY)
         .get_json()
     )
 
@@ -72,13 +74,27 @@ def cls_menu_apply():
         .row()
         .add(Text('Применить', {'cmd': 'apply'}), KeyboardButtonColor.POSITIVE)
         .row()
-        .add(Text('Назад', {'cmd': 'undo'}), KeyboardButtonColor.PRIMARY)
+        .add(Text('Назад', {'cmd': 'undo_schedule'}), KeyboardButtonColor.PRIMARY)
         .get_json()
     )
 
-def undo_button():
+#admin_tree
+def admin_menu():
     return (
         Keyboard(one_time = True)
-        .add(Text('Назад', {'cmd': 'undo'}), KeyboardButtonColor.PRIMARY)
+        .add(Text('Посмотреть доступные уровни', {'cmd': 'al_shw_menu'}))
+        .add(Text('Отредактировать уровень', {'cmd': 'al_upd_menu'}))
+        .row()
+        .add(Text('Выдать права доступа', {'cmd': 'adm_add_menu'}))
+        .row()
+        .add(Text('Назад', {'cmd': 'undo_admin'}), KeyboardButtonColor.PRIMARY)
+        .get_json()
+    )
+
+#undo button
+def undo_button(arg):
+    return (
+        Keyboard(one_time = True)
+        .add(Text('Назад', {'cmd': 'undo_'+arg}), KeyboardButtonColor.PRIMARY)
         .get_json()
     )
