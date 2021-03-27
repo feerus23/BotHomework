@@ -10,7 +10,7 @@ def begin_menu():
 def main_menu():
     return (
         Keyboard(one_time = True)
-        .add(Text('Расписание', {'cmd': 'schedule_menu'}))
+        .add(Text('Расписание', {'cmd': 'sedit_menu'}))
         .add(Text('Домашнее задание', {'cmd': 'homework_menu'}))
         .row()
         .add(Callback('Администраторская панель', {'cmd': 'admin_menu'}), KeyboardButtonColor.NEGATIVE)

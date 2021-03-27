@@ -35,14 +35,14 @@ async def undo_handler(message: Message):
         await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN, payload={'cmd': 'main_menu'})
         await main_handler(message)
     elif state == stateMenu.SCHEDULE:
-        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN, payload={'cmd': 'schedule_menu'})
-        await schedule_handler(message)
+        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN, payload={'cmd': 'main_menu'})
+        await main_handler(message)
     elif state == stateMenu.CWS:
-        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.MAIN, payload={'cmd': 'sedit_menu'})
-        await sedit_handler(message)
-    elif state == stateMenu.CLS:
         await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.SCHEDULE, payload={'cmd': 'cws_menu'})
         await cws_handler(message)
+    elif state == stateMenu.CLS:
+        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.CWS, payload={'cmd': 'cls_menu'})
+        await cls_handler(message)
 
 @bp.on.private_message(state=None)
 async def begin_handler(message: Message):  
@@ -64,7 +64,7 @@ async def main_handler(message: Message):
     await message.answer('Чего изволите товарищ?', keyboard=kbrd.main_menu())
     
 
-@bp.on.private_message(state=stateMenu.BEGIN, payload={'cmd': 'schedule_menu'})
+'''@bp.on.private_message(state=stateMenu.BEGIN, payload={'cmd': 'schedule_menu'})
 async def schedule_handler(message: Message):
     schedule = data.Schedule(SCHEDULE_STANDART)
 
@@ -76,8 +76,9 @@ async def schedule_handler(message: Message):
         await message.answer('Лол походу с чем-то напортачил...))', keyboard=kbrd.schedule_menu())    
 
     await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.MAIN)
+'''
 
-@bp.on.private_message(state=stateMenu.MAIN, payload={'cmd': 'sedit_menu'})
+@bp.on.private_message(state=stateMenu.BEGIN, payload={'cmd': 'sedit_menu'})
 async def sedit_handler(message: Message):
     await message.answer('Выберите день недели', keyboard=kbrd.sedit_menu())
 
