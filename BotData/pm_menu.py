@@ -38,11 +38,11 @@ async def undo_handler(message: Message):
         await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN, payload={'cmd': 'main_menu'})
         await main_handler(message)
     elif state == stateMenu.CWS:
-        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.SCHEDULE, payload={'cmd': 'cws_menu'})
-        await cws_handler(message)
+        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.SCHEDULE, payload={'cmd': 'sedit_menu'})
+        await sedit_handler(message)
     elif state == stateMenu.CLS:
-        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.CWS, payload={'cmd': 'cls_menu'})
-        await cls_handler(message)
+        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.CWS, payload={'cmd': 'cws_menu'})
+        await cws_handler(message)
 
 @bp.on.private_message(state=None)
 async def begin_handler(message: Message):  
