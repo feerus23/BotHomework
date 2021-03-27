@@ -9,6 +9,9 @@ del tvar
 con = sql.connect('BotData\\base.sqlite')
 curs = con.cursor()
 
+ORIGINAL = 0
+MODIFIED = 1
+
 def checkDatabase():
     'Checking database function'
     try:
@@ -18,26 +21,26 @@ def checkDatabase():
             '''CREATE TABLE IF NOT EXISTS users (
                 id INT(32) NOT NULL PRIMARY KEY,
                 permission INT(2) NOT NULL,
-                grade VARCHAR(3) NOT NULL
+                grade VARCHAR(3)
             );''', 
             '''CREATE TABLE IF NOT EXISTS schedule (
-                day_of_week INT(1) NOT NULL PRIMARY KEY,
-                les_1st VARCHAR(127) NOT NULL,
-                les_2nd VARCHAR(127) NOT NULL,
-                les_3rd VARCHAR(127) NOT NULL,
-                les_4th VARCHAR(127) NOT NULL,
-                les_5th VARCHAR(127) NOT NULL,
-                les_6th VARCHAR(127) NOT NULL
+                day_of_week INT(1) NOT NULL PRIMARY KEY ON CONFLICT REPLACE,
+                les_1st VARCHAR(128),
+                les_2nd VARCHAR(128),
+                les_3rd VARCHAR(128),
+                les_4th VARCHAR(128),
+                les_5th VARCHAR(128),
+                les_6th VARCHAR(128)
             );''', 
             '''CREATE TABLE IF NOT EXISTS homework (
                 day_of_week CHAR(3) NOT NULL PRIMARY KEY,
-                date DATE(10) NOT NULL UNIQUE,
-                les_1st VARCHAR(127) NOT NULL,
-                les_2nd VARCHAR(127) NOT NULL,
-                les_3rd VARCHAR(127) NOT NULL,
-                les_4th VARCHAR(127) NOT NULL,
-                les_5th VARCHAR(127) NOT NULL,
-                les_6th VARCHAR(127) NOT NULL
+                date DATE(10) NOT NULL UNIQUE ON CONFLICT REPLACE,
+                les_1st VARCHAR(128),
+                les_2nd VARCHAR(128),
+                les_3rd VARCHAR(128),
+                les_4th VARCHAR(128),
+                les_5th VARCHAR(128),
+                les_6th VARCHAR(128)
             );''',
             '''CREATE TABLE IF NOT EXISTS titles (
                 permission INT(2) NOT NULL PRIMARY KEY,
@@ -181,123 +184,189 @@ class Users:
             retvals += (self.__Vars.get(v, None),)
 
         return retvals
+    
+    def vDel(self, *args):
+        if len(args) == 1:
+            del self.__Vars[args[0]]
+        else:
+            for v in args:
+                del self.__Vars[v]
 
 class Schedule:
     'Класс для работы с расписанием'
 
     standart = [ i for i in range(1,7) ]
-    empty_schedule = [ [ None for i in range(0,7) ] for i in range(1,7) ]
-    res = empty_schedule.copy()
-    aRes = empty_schedule.copy()
+
+    res = [ None ]
+    aRes = [ None ]
+    for i in range(1,7):
+        res += [ [ i ] + [ None for i in range(0, 6) ] ]
+        aRes += [ [ i ] + [ None for i in range(0, 6) ] ]
+    
+    
     dow = []
 
-    difference = False
-
     __tfDict = {
-        'понедельник': 1,
-        'вторник': 2,
-        'среда': 3,
-        'четверг': 4,
-        'пятница': 5,
-        'суббота': 6
+        'Понедельник': 1,
+        'Вторник': 2,
+        'Среда': 3,
+        'Четверг': 4,
+        'Пятница': 5,
+        'Суббота': 6
     }
 
     def __tfDowSQL(self, string):
         return self.__tfDict.get(string, False)
 
     def __tfDowStr(self, integer):
-        return {v:k for k, v in self.__tfDict.items()}.get(integer, False)
+        return { v:k for k, v in self.__tfDict.items() }.get(integer, False)
         
 
-    def __init__(self, day_of_week):
-        if type(day_of_week) == str:
-            self.dow = [ self.__tfDowSQL(day_of_week) ]
-        elif type(day_of_week) == int:
-            self.dow = [ day_of_week ]
-        elif type(day_of_week) == list:
-            for day in day_of_week:
+    def __init__(self, days_of_week):
+        def __tempFunc():
+            curs.execute('SELECT * FROM schedule WHERE day_of_week = ?', (days_of_week,))
+            if ftch := curs.fetchone():
+                self.res[days_of_week] = list(ftch)
+                #self.aRes = self.res.copy()
+        
+        if type(days_of_week) == str:
+            self.dow = [ self.__tfDowSQL(days_of_week) ]
+            __tempFunc()
+        elif type(days_of_week) == int:
+            self.dow = [ days_of_week ]
+            __tempFunc()
+        elif type(days_of_week) == list:
+            for day in days_of_week:
                 if not (day in self.standart):
                     if not (day := self.__tfDowSQL(day)):
                         break
                 self.dow.append(day)
 
-            if len(self.dow) != len(day_of_week): 
-                return 
+            if len(self.dow) != len(days_of_week): 
+                #return 
+                pass
 
             for day in self.dow:
                 curs.execute('SELECT * FROM schedule WHERE day_of_week = ?', (day,))
                 if ftch := curs.fetchone():
-                    self.res[day].append(ftch)
-
-            return
-
-        curs.execute('SELECT * FROM schedule WHERE day_of_week = ?', (day_of_week,))
-        if ftch := curs.fetchone():
-            self.res.append(ftch)
-    
-    def getRes(self):
-        return self.res
-
-    def getLesson(self, lessons = standart, day_of_week = dow):
-        'Функция возвращающая названия уроков списком.'
-        if type(lessons) == int: lessons = [ lessons ]
-
-        les_names = self.empty_schedule.copy()
-
-        for day in day_of_week:
-            les_names[day][0] = self.__tfDowStr(day)
-
-            for i in range(0, len(lessons)):
-                try:
-                    tvar = self.res[day][lessons[i]]
-                except IndexError:
-                    les_names[day].append(str(i+1) + ') Нет данных')
-                else:
-                    if not tvar:
-                        les_names[day].append(str(i+1) + ') Нет данных')
-                    else:
-                        les_names[day].append(str(i+1) + ') ' + tvar)
-        
-        return les_names
-    
-    def getELesson(self, lessons = standart, day_of_week = dow):
-        if type(lessons) == int: lessons = [ lessons ]
-
-        les_names = self.empty_schedule.copy()
-
-        for day in day_of_week:
-            les_names[day][0] = self.__tfDowStr(day)
+                    self.res[day] = list(ftch)
             
-            for i in range(0, len(lessons)):
-                try:
-                    tvar = self.res[day][lessons[i]]
-                except IndexError:
-                    les_names[day].append(str(i+1) + ') Нет данных')
-                else:
-                    if not tvar:
-                        les_names[day].append(str(i+1) + ') Нет данных')
-                    else:
-                        les_names[day].append(str(i+1) + ') ' + tvar)
-        
-        return les_names
-    
-    def setLesson(self, lesson_number, name):
-        self.aRes[lesson_number] = name
-    
-    def compare(self):
-        #if len(self.res) != len(self.aRes): return False
+            #self.aRes = self.res.copy()
 
-        for i in range(1, len(self.res)+1):
-            if self.aRes[i] != self.res[i] and self.aRes[i] != None:
-                self.difference = True
-                break
+            #return
     
-        return len(self.res), len(self.aRes)
+    def getRes(self, fl = ORIGINAL):
+        if fl == ORIGINAL:
+            res = self.res
+        elif fl == MODIFIED:
+            res = self.aRes
+        return res
+    
+
+    def __getLesDict(self, days_of_week = None, lessons_numbers = None, from_list = ORIGINAL):
+        if days_of_week is None: days_of_week = self.dow.copy()
+        if lessons_numbers is None: lessons_numbers = self.standart.copy()
+
+        if type(lessons_numbers) == int: lessons_numbers = [ lessons_numbers ]
+        if type(days_of_week) == int: days_of_week = [ days_of_week ]
+
+        if from_list == ORIGINAL:
+            res = self.res.copy()
+        elif from_list == MODIFIED:
+            res = self.aRes.copy()
+
+        lessons = {}
+        for day in days_of_week:
+            lessons.update([(day, {})])
+
+            for les in lessons_numbers:
+                if not (value := res[day][les]):
+                    value = 'Нет данных'
+                lessons[day].update([(les, value)])
+                
+        return lessons, days_of_week, lessons_numbers
+    
+    def getLesson(self, days_of_week = None, lessons_numbers = None, from_list = ORIGINAL) -> str:
+        result, dow, _ = self.__getLesDict(days_of_week, lessons_numbers, from_list)
+
+        string = str()
+
+        for day in dow:
+            tlen_1, tlen_2 = 0, 0
+            for les, val in result[day].items():
+                tlen_1 += 1
+                if tlen_1 != len(result[day]):
+                    string += str(les) + ') ' + val + '\n'
+                else:
+                    string += str(les) + ') ' + val
+            
+            if tlen_2:
+                string += '\n'
+            
+            tlen_2 += 1
+        
+        return string
+    
+    def setLesson(self, days_of_week, lesson_number, value):
+        self.aRes[days_of_week][lesson_number] = value
+    
+    def compare(self, days_of_week = None, lesson_numbers = None):
+        #if len(self.res) != len(self.aRes): return False
+        if days_of_week is None: days_of_week = self.dow
+        if lesson_numbers is None: lesson_numbers = self.standart
+
+        if type(lesson_numbers) == int: lesson_numbers = [ lesson_numbers ]
+
+        for day in days_of_week:
+            difference = False
+
+            for les in lesson_numbers:
+                if self.aRes[day][les] != self.res[day][les] and self.aRes[day][les] is not None:
+                    difference = True
+                    break
+    
+        return difference
     
     def isEmpty(self):
-        for i in self.res:
-            pass
+        tog = True
 
+        for day in self.res:
+            if not (day is None): 
+                if not (day[0] is None):
+                    for les in day:
+                        if les != None and type(les) != int:
+                            tog = False
+        
+        return tog
     
-    def getDow(self):
-        return self.dow
+    def getDow(self, mode = 1):
+        if mode == 1:
+            return self.__tfDowStr(self.dow[0])
+        elif mode == 2:
+            return self.dow
+
+    def merge(self):
+        cRes, caRes = self.res.copy(), self.aRes.copy()
+        result = cRes.copy()
+
+        for day in self.dow:
+            for i in range(1, len(caRes)):
+                if caRes[day][i] != cRes[day][i] and caRes[day][i] != None:
+                    result[day][i] = caRes[day][i]
+
+        return result
+
+    def save(self, days_of_week = None):
+        if days_of_week is None: days_of_week = self.dow
+        values = self.merge()
+
+        for day in days_of_week:
+            query = 'INSERT OR REPLACE INTO schedule VALUES (?, ?, ?, ?, ?, ?, ?)'
+            curs.execute(query, tuple(values[day]))
+        
+        con.commit()
+
+        #self.__init__(days_of_week)
+    
+    def update(self):
+        pass
