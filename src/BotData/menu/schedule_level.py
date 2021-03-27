@@ -49,7 +49,8 @@ async def begin_handler(message: Message):
     usr.update([(message.peer_id, data.Users(message.peer_id))])
 
     info = await GetUInfo(message.from_id)
-    msg = f'Рад вас видеть в добром здравии, товарищ {data.Title().Get(usr[message.peer_id].getParam(1))}, {info.last_name}.'
+    if title := data.Title().Get(usr[message.peer_id].getParam(1)):
+        msg = f'Рад вас видеть в добром здравии, товарищ {title}, {info.last_name}.'
 
     if usr[message.peer_id].getParam(0):
         await message.answer(msg, keyboard = keyboard.begin_menu())
