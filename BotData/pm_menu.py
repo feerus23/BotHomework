@@ -83,7 +83,8 @@ async def sedit_handler(message: Message):
     await message.answer('Выберите день недели', keyboard=kbrd.sedit_menu())
 
     if usr[message.peer_id].vGet('sobj'):
-        usr[message.peer_id].vDel('sobj')
+        #usr[message.peer_id].vDel('sobj')
+        pass
     
     await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.SCHEDULE)
 
@@ -98,7 +99,6 @@ async def cws_handler(message: Message):
 
     await message.answer(tstr)
 
-    #await message.answer(schedule.getRes(data.MODIFIED))
     if schedule.compare():
         await message.answer('Выберите урок, который хотите изменить.', keyboard=kbrd.cls_menu_apply())
     else:

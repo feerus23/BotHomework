@@ -223,37 +223,26 @@ class Schedule:
         
 
     def __init__(self, days_of_week):
-        def __tempFunc():
-            curs.execute('SELECT * FROM schedule WHERE day_of_week = ?', (days_of_week,))
-            if ftch := curs.fetchone():
-                self.res[days_of_week] = list(ftch)
-                #self.aRes = self.res.copy()
         
-        if type(days_of_week) == str:
-            self.dow = [ self.__tfDowSQL(days_of_week) ]
-            __tempFunc()
-        elif type(days_of_week) == int:
-            self.dow = [ days_of_week ]
-            __tempFunc()
-        elif type(days_of_week) == list:
-            for day in days_of_week:
-                if not (day in self.standart):
-                    if not (day := self.__tfDowSQL(day)):
-                        break
-                self.dow.append(day)
+        if type(days_of_week) == str: days_of_week = [ self.__tfDowSQL(days_of_week) ]
+        elif type(days_of_week) == int: days_of_week = [ days_of_week ]
 
-            if len(self.dow) != len(days_of_week): 
-                #return 
-                pass
+        for day in days_of_week:
+            if not (day in self.standart):
+                if not (day := self.__tfDowSQL(day)):
+                    break
+            self.dow.append(day)
 
-            for day in self.dow:
-                curs.execute('SELECT * FROM schedule WHERE day_of_week = ?', (day,))
-                if ftch := curs.fetchone():
-                    self.res[day] = list(ftch)
-            
-            #self.aRes = self.res.copy()
+        if len(self.dow) != len(days_of_week): 
+            #return 
+            pass
 
-            #return
+        for day in self.dow:
+            curs.execute('SELECT * FROM schedule WHERE day_of_week = ?', (day,))
+            if ftch := curs.fetchone():
+                self.res[day] = list(ftch)
+        
+        #self.aRes = self.res.copy()
     
     def getRes(self, fl = ORIGINAL):
         if fl == ORIGINAL:
@@ -262,7 +251,6 @@ class Schedule:
             res = self.aRes
         return res
     
-
     def __getLesDict(self, days_of_week = None, lessons_numbers = None, from_list = ORIGINAL):
         if days_of_week is None: days_of_week = self.dow.copy()
         if lessons_numbers is None: lessons_numbers = self.standart.copy()
