@@ -40,7 +40,7 @@ def checkDatabase():
             );''',
             '''CREATE TABLE IF NOT EXISTS titles (
                 permission INT(2) NOT NULL PRIMARY KEY ON CONFLICT REPLACE,
-                name CHAR(127) NOT NULL UNIQUE
+                name CHAR(128) NOT NULL UNIQUE
             )'''
         ]
 

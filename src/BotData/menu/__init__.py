@@ -1,3 +1,3 @@
-from . import schedule_level
+from . import schedule_tree, admin_tree, main_tree
 
-bps = [schedule_level.bp]
+bps = [ main_tree.bp, schedule_tree.bp, admin_tree.bp ]
