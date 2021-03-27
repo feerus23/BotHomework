@@ -8,15 +8,23 @@ def begin_menu():
         .get_json()
     )
 
-def main_menu():
-    return (
-        Keyboard(one_time = True)
-        .add(Text('Расписание', {'cmd': 'sedit_menu'}))
-        .add(Text('Домашнее задание', {'cmd': 'homework_menu'}))
-        .row()
-        .add(Text('Администраторская панель', {'cmd': 'admin_menu'}), KeyboardButtonColor.POSITIVE)
-        .get_json()
-    )
+def main_menu(mod='user'):
+    if mod == 'user':
+        return (
+            Keyboard(one_time = True)
+            .add(Text('Расписание', {'cmd': 'sedit_menu'}))
+            .add(Text('Домашнее задание', {'cmd': 'homework_menu'}))
+            .get_json()
+        )
+    elif mod == 'admin':
+        return (
+            Keyboard(one_time = True)
+            .add(Text('Расписание', {'cmd': 'sedit_menu'}))
+            .add(Text('Домашнее задание', {'cmd': 'homework_menu'}))
+            .row()
+            .add(Text('Администраторская панель', {'cmd': 'admin_menu'}), KeyboardButtonColor.POSITIVE)
+            .get_json()
+        )
 
 #schedule_tree
 def schedule_menu():
