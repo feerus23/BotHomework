@@ -1,4 +1,4 @@
-from . import pm_menu, data
+from . import menu, data
 
-bps = [ pm_menu.bp ]
+bps = menu
 

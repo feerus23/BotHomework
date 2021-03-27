@@ -4,7 +4,7 @@ from vkbottle_types.objects import UsersUserXtrCounters
 
 import re
 
-from . import data, kbrd
+from .. import data, keyboard
 
 usr = {}
 
@@ -52,7 +52,7 @@ async def begin_handler(message: Message):
     msg = f'Рад вас видеть в добром здравии, товарищ {data.Title().Get(usr[message.peer_id].getParam(1))}, {info.last_name}.'
 
     if usr[message.peer_id].getParam(0):
-        await message.answer(msg, keyboard = kbrd.begin_menu())
+        await message.answer(msg, keyboard = keyboard.begin_menu())
         await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN)
     else:
         await message.answer('Ты еще кто такой? Мне мама с незнакомцами запрещает разговаривать.')
@@ -61,7 +61,7 @@ async def begin_handler(message: Message):
 
 @bp.on.private_message(state=stateMenu.BEGIN, payload={'cmd': 'main_menu'})
 async def main_handler(message: Message):
-    await message.answer('Чего изволите товарищ?', keyboard=kbrd.main_menu())
+    await message.answer('Чего изволите товарищ?', keyboard=keyboard.main_menu())
     
 
 '''@bp.on.private_message(state=stateMenu.BEGIN, payload={'cmd': 'schedule_menu'})
@@ -70,17 +70,17 @@ async def schedule_handler(message: Message):
 
     if schedule.isEmpty():
         await message.answer('Вау, еще ни одного урока в расписании не указано.')
-        await message.answer('Хотите заполнить?', keyboard=kbrd.schedule_menu())
+        await message.answer('Хотите заполнить?', keyboard=keyboard.schedule_menu())
     else:
         await message.answer('Эм...))')
-        await message.answer('Лол походу с чем-то напортачил...))', keyboard=kbrd.schedule_menu())    
+        await message.answer('Лол походу с чем-то напортачил...))', keyboard=keyboard.schedule_menu())    
 
     await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.MAIN)
 '''
 
 @bp.on.private_message(state=stateMenu.BEGIN, payload={'cmd': 'sedit_menu'})
 async def sedit_handler(message: Message):
-    await message.answer('Выберите день недели', keyboard=kbrd.sedit_menu())
+    await message.answer('Выберите день недели', keyboard=keyboard.sedit_menu())
 
     if usr[message.peer_id].vGet('sobj'):
         #usr[message.peer_id].vDel('sobj')
@@ -100,9 +100,9 @@ async def cws_handler(message: Message):
     await message.answer(tstr)
 
     if schedule.compare():
-        await message.answer('Выберите урок, который хотите изменить.', keyboard=kbrd.cls_menu_apply())
+        await message.answer('Выберите урок, который хотите изменить.', keyboard=keyboard.cls_menu_apply())
     else:
-        await message.answer('Выберите урок, который хотите изменить.', keyboard=kbrd.cls_menu())
+        await message.answer('Выберите урок, который хотите изменить.', keyboard=keyboard.cls_menu())
 
     await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.CWS)
 
@@ -122,7 +122,7 @@ async def cls_handler(message: Message):
     schedule = usr[message.peer_id].vGet('sobj')
     lesnum = usr[message.peer_id].vSet(lesnum=int(re.search(r'\d', message.text)[0]))
 
-    await message.answer(f'Вы выбрали урок {schedule.getLesson(lessons_numbers = lesnum)}.\n Введите название урока на который хотите заменить этот урок.', keyboard=kbrd.undo_button())
+    await message.answer(f'Вы выбрали урок {schedule.getLesson(lessons_numbers = lesnum)}.\n Введите название урока на который хотите заменить этот урок.', keyboard=keyboard.undo_button())
 
     if schedule.compare(lesson_numbers=lesnum):
         await message.answer(f'Также ваши не сохранённые изменения: {schedule.getLesson(lessons_numbers = lesnum, from_list=data.MODIFIED)}')
