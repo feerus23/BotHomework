@@ -1,69 +1,29 @@
-from vkbottle import BaseStateGroup, Keyboard, Text, BaseMiddleware
+from vkbottle import BaseStateGroup, Keyboard, Text
 from vkbottle.bot import Blueprint, Message
-from vkbottle_types.objects import UsersUserXtrCounters
+
 
 import re
 
+from .main_tree import stateMenu, usr, main_handler
 from .. import data, keyboard
-
-usr = {}
 
 bp = Blueprint()
 
 SCHEDULE_STANDART = [ i for i in range(1,7) ]
 
-class stateMenu(BaseStateGroup):
-    BEGIN = 0
-    IGNORE = 1
-    MAIN = 2
-    SCHEDULE = 3
-    CWS = 4
-    CLS = 5
-
-async def GetUInfo(user_id):
-    return (await bp.api.users.get(user_id))[0]
-
-async def resetData(id):
-    del usr[id]
-    await bp.state_dispenser.set(id, None)
-
-@bp.on.private_message(payload={'cmd': 'undo'})
-async def undo_handler(message: Message):
+@bp.on.private_message(payload={'cmd': 'undo_schedule'})
+async def schedule_tree_undo_handler(message: Message):
     state = message.state_peer.state
 
-    if state == stateMenu.MAIN:
-        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN, payload={'cmd': 'main_menu'})
-        await main_handler(message)
-    elif state == stateMenu.SCHEDULE:
-        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN, payload={'cmd': 'main_menu'})
-        await main_handler(message)
-    elif state == stateMenu.CWS:
+    if state == stateMenu.CWS:
         await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.SCHEDULE, payload={'cmd': 'sedit_menu'})
         await sedit_handler(message)
     elif state == stateMenu.CLS:
         await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.CWS, payload={'cmd': 'cws_menu'})
-        await cws_handler(message)
-
-@bp.on.private_message(state=None)
-async def begin_handler(message: Message):  
-    usr.update([(message.peer_id, data.Users(message.peer_id))])
-
-    info = await GetUInfo(message.from_id)
-    if title := data.Title().Get(usr[message.peer_id].getParam(1)):
-        msg = f'Рад вас видеть в добром здравии, товарищ {title}, {info.last_name}.'
-
-    if usr[message.peer_id].getParam(0):
-        await message.answer(msg, keyboard = keyboard.begin_menu())
-        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN)
-    else:
-        await message.answer('Ты еще кто такой? Мне мама с незнакомцами запрещает разговаривать.')
-        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.IGNORE)
-        return
-
-@bp.on.private_message(state=stateMenu.BEGIN, payload={'cmd': 'main_menu'})
-async def main_handler(message: Message):
-    await message.answer('Чего изволите товарищ?', keyboard=keyboard.main_menu())
-    
+        await cws_handler(message)    
+    elif state == stateMenu.SCHEDULE:
+        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN, payload={'cmd': 'main_menu'})
+        await main_handler(message)
 
 '''@bp.on.private_message(state=stateMenu.BEGIN, payload={'cmd': 'schedule_menu'})
 async def schedule_handler(message: Message):
@@ -123,7 +83,7 @@ async def cls_handler(message: Message):
     schedule = usr[message.peer_id].vGet('sobj')
     lesnum = usr[message.peer_id].vSet(lesnum=int(re.search(r'\d', message.text)[0]))
 
-    await message.answer(f'Вы выбрали урок {schedule.getLesson(lessons_numbers = lesnum)}.\n Введите название урока на который хотите заменить этот урок.', keyboard=keyboard.undo_button())
+    await message.answer(f'Вы выбрали урок {schedule.getLesson(lessons_numbers = lesnum)}.\n Введите название урока на который хотите заменить этот урок.', keyboard=keyboard.undo_button('schedule'))
 
     if schedule.compare(lesson_numbers=lesnum):
         await message.answer(f'Также ваши не сохранённые изменения: {schedule.getLesson(lessons_numbers = lesnum, from_list=data.MODIFIED)}')
