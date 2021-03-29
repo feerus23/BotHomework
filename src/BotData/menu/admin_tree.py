@@ -1,6 +1,5 @@
-from vkbottle import BaseStateGroup, Keyboard, Text, BaseMiddleware
 from vkbottle.bot import Blueprint, Message
-from vkbottle_types.objects import UsersUserXtrCounters
+from vkbottle.exception_factory import VKAPIError
 
 import re
 
@@ -24,10 +23,16 @@ async def admin_tree_undo_handler(message: Message):
         await al_upd_handler(message)
     elif state == stateMenu.ADMIN_SHW_1:
         await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN, payload={'cmd': 'admin_menu'})
-        await amenu_handler(message)    
+        await amenu_handler(message)
     elif state == stateMenu.ADMIN_ADD_1:
         await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.BEGIN, payload={'cmd': 'admin_menu'})
-        await amenu_handler(message)   
+        await amenu_handler(message)
+    elif state == stateMenu.ADMIN_ADD_2:
+        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.ADMIN_MAIN, payload = {'cmd': 'adm_add_menu'})
+        await adm_add_handler(message)
+    elif state == stateMenu.ADMIN_ADD_3:
+        await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.ADMIN_ADD_1)
+        await adm_input_id_handler(message)
 
 @bp.on.private_message(state=stateMenu.BEGIN, payload = {'cmd': 'admin_menu'})
 async def amenu_handler(message: Message):
@@ -92,11 +97,35 @@ async def adm_add_handler(message: Message):
 
 @bp.on.private_message(state=stateMenu.ADMIN_ADD_1)
 async def adm_input_id_handler(message: Message):
-    USER = await GetUInfo(re.search(r'\w+', message.text)[0], name_case='gen')
-    usr[message.peer_id].vSet(add_user_id = USER.id)
-    await message.answer(f'Вы выбрали {USER.first_name} {USER.last_name}. Если вы ошиблись нажмите "Назад" и введите адрес снова.')
-    await message.answer('А теперь введите уровень доступа, который вы хотите выдать', keyboard=keyboard.undo_button('admin'))
-    await bp.state_dispenser.set(message.peer_id, stateMenu.ADMIN_ADD_2)
+    if message.text != 'Назад':
+        try:
+            USER = await GetUInfo(re.search(r'\w+', message.text)[0], name_case='gen')
+        except VKAPIError(113):
+            await message.answer('Вы ввели некорректное значение, попробуйте снова!')
+
+            await bp.state_dispenser.set(state=stateMenu.ADMIN_MAIN, payload = {'cmd': 'adm_add_menu'})
+            await adm_add_handler(message)
+        else:
+            usr[message.peer_id].vSet(add_user_id = USER.id)
+
+            await message.answer(f'Вы выбрали {USER.first_name} {USER.last_name}. Если вы ошиблись нажмите "Назад" и введите адрес снова.')
+            await message.answer('А теперь введите уровень доступа, который вы хотите выдать', keyboard=keyboard.undo_button('admin'))
+            await bp.state_dispenser.set(message.peer_id, stateMenu.ADMIN_ADD_2)
+    elif message.payload == {'cmd': 'undo'}:
+        try:
+            USER = await GetUInfo(usr[message.peer_id].vGet('add_user_id'), name_case='gen')
+        except VKAPIError(113):
+            await message.answer('Вы ввели некорректное значение, попробуйте снова!')
+
+            await bp.state_dispenser.set(state=stateMenu.ADMIN_MAIN, payload = {'cmd': 'adm_add_menu'})
+            await adm_add_handler(message)
+        else:
+            usr[message.peer_id].vSet(add_user_id = USER.id)
+
+            await message.answer(f'Вы выбрали {USER.first_name} {USER.last_name}. Если вы ошиблись нажмите "Назад" и введите адрес снова.')
+            await message.answer('А теперь введите уровень доступа, который вы хотите выдать', keyboard=keyboard.undo_button('admin'))
+            await bp.state_dispenser.set(message.peer_id, stateMenu.ADMIN_ADD_2)
+
 
 @bp.on.private_message(state=stateMenu.ADMIN_ADD_2)
 async def adm_input_lvl_handler(message: Message):
@@ -121,4 +150,8 @@ async def adm_input_grd_handler(message: Message):
     await amenu_handler(message)
 
     data.Users(uId).createUser(grade=message.text, permission=uPerm)
-    
+
+#ADMIN LIST BLOCK
+@bp.on.private_message(state=stateMenu.ADMIN_MAIN, payload = {'cmd': 'adm_list_menu'})
+async def adm_list_handler(message: Message):
+    pass

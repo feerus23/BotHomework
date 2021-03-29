@@ -19,12 +19,14 @@ class stateMenu(BaseStateGroup):
     #main_tree
     BEGIN = 0
     IGNORE = 1
-    #schedule_tree
-    MAIN = 2
 
+    MAIN = 2
+    
+    #schedule_tree
     SCHEDULE = 3
     CWS = 4
     CLS = 5
+
     #admin_tree
     ADMIN_MAIN = 6
 
@@ -36,6 +38,9 @@ class stateMenu(BaseStateGroup):
     ADMIN_ADD_1 = 10
     ADMIN_ADD_2 = 11
     ADMIN_ADD_3 = 12
+
+    #homework_tree
+    HOMEWORK = 13
 
 @bp.on.private_message(state=None)
 async def begin_handler(message: Message):  

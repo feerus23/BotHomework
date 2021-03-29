@@ -1,4 +1,4 @@
-from .data import curs, con
+from .data import curs, con, tfDowSQL, tfDowStr
 
 ORIGINAL = 0
 MODIFIED = 1
@@ -7,40 +7,25 @@ class Schedule:
     'Класс для работы с расписанием'
 
     standart = [ i for i in range(1,7) ]
-
-    res = [ None ]
-    aRes = [ None ]
-    for i in range(1,7):
-        res += [ [ i ] + [ None for i in range(0, 6) ] ]
-        aRes += [ [ i ] + [ None for i in range(0, 6) ] ]
-    
-    
-    dow = []
-
-    __tfDict = {
-        'Понедельник': 1,
-        'Вторник': 2,
-        'Среда': 3,
-        'Четверг': 4,
-        'Пятница': 5,
-        'Суббота': 6
-    }
-
-    def __tfDowSQL(self, string):
-        return self.__tfDict.get(string, False)
-
-    def __tfDowStr(self, integer):
-        return { v:k for k, v in self.__tfDict.items() }.get(integer, False)
         
-
     def __init__(self, days_of_week):
+        'Эээ... Метод инициализации-кун?'
+
+        self.res = [ None ]
+        self.aRes = [ None ]
+        for i in range(1,7):
+            self.res += [ [ i ] + [ None for i in range(0, 6) ] ]
+            self.aRes += [ [ i ] + [ None for i in range(0, 6) ] ]
         
-        if type(days_of_week) == str: days_of_week = [ self.__tfDowSQL(days_of_week) ]
+        
+        self.dow = []
+        
+        if type(days_of_week) == str: days_of_week = [ tfDowSQL(days_of_week) ]
         elif type(days_of_week) == int: days_of_week = [ days_of_week ]
 
         for day in days_of_week:
             if not (day in self.standart):
-                if not (day := self.__tfDowSQL(day)):
+                if not (day := tfDowSQL(day)):
                     break
             self.dow.append(day)
 
@@ -140,7 +125,7 @@ class Schedule:
     
     def getDow(self, mode = 1):
         if mode == 1:
-            return self.__tfDowStr(self.dow[0])
+            return tfDowStr(self.dow[0])
         elif mode == 2:
             return self.dow
 

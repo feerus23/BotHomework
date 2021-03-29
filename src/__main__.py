@@ -13,4 +13,5 @@ def main():
     bot.run_forever()
 
 if __name__ == '__main__':
+    BotData.data.data.checkDatabase()
     main()

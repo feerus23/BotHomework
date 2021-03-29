@@ -1,5 +1,9 @@
 from vkbottle import Keyboard, Text, Callback, KeyboardButtonColor
 
+__trees = {
+    'schedule': ('cws_menu', 'cls_menu')
+}
+
 #main_tree
 def begin_menu():
     return (
@@ -36,56 +40,6 @@ def schedule_menu():
         .get_json()
     )
 
-def sedit_menu():
-    return (
-        Keyboard(one_time = True)
-        .add(Text('Понедельник', {'cmd': 'cws_menu'}))
-        .add(Text('Вторник', {'cmd': 'cws_menu'}))
-        .row()
-        .add(Text('Среда', {'cmd': 'cws_menu'}))
-        .add(Text('Четверг', {'cmd': 'cws_menu'}))
-        .add(Text('Пятница', {'cmd': 'cws_menu'}))
-        .row()
-        .add(Text('Суббота', {'cmd': 'cws_menu'}))
-        .row()
-        .add(Text('Назад', {'cmd': 'undo_schedule'}), KeyboardButtonColor.PRIMARY)
-        .get_json()
-    )
-
-def cls_menu():
-    return (
-        Keyboard(one_time = True)
-        .add(Text('1 урок', {'cmd': 'cls_menu'}))
-        .row()
-        .add(Text('2 урок', {'cmd': 'cls_menu'}))
-        .add(Text('3 урок', {'cmd': 'cls_menu'}))
-        .row()
-        .add(Text('4 урок', {'cmd': 'cls_menu'}))
-        .add(Text('5 урок', {'cmd': 'cls_menu'}))
-        .add(Text('6 урок', {'cmd': 'cls_menu'}))
-        .row()
-        .add(Text('Назад', {'cmd': 'undo_schedule'}), KeyboardButtonColor.PRIMARY)
-        .get_json()
-    )
-
-def cls_menu_apply():
-    return (
-        Keyboard(one_time = True)
-        .add(Text('1 урок', {'cmd': 'cls_menu'}))
-        .row()
-        .add(Text('2 урок', {'cmd': 'cls_menu'}))
-        .add(Text('3 урок', {'cmd': 'cls_menu'}))
-        .row()
-        .add(Text('4 урок', {'cmd': 'cls_menu'}))
-        .add(Text('5 урок', {'cmd': 'cls_menu'}))
-        .add(Text('6 урок', {'cmd': 'cls_menu'}))
-        .row()
-        .add(Text('Применить', {'cmd': 'apply'}), KeyboardButtonColor.POSITIVE)
-        .row()
-        .add(Text('Назад', {'cmd': 'undo_schedule'}), KeyboardButtonColor.PRIMARY)
-        .get_json()
-    )
-
 #admin_tree
 def admin_menu():
     return (
@@ -94,10 +48,69 @@ def admin_menu():
         .add(Text('Отредактировать уровень', {'cmd': 'al_upd_menu'}))
         .row()
         .add(Text('Выдать права доступа', {'cmd': 'adm_add_menu'}))
+        .add(Text('Список пользователей', {'cmd': 'adm_list_menu'}))
         .row()
         .add(Text('Назад', {'cmd': 'undo_admin'}), KeyboardButtonColor.PRIMARY)
         .get_json()
     )
+
+#homework_tree
+
+#both schedule-homework
+def sedit_menu(tree = 'schedule'):
+    
+    if payload := __trees.get(tree)[0]:
+        return (
+            Keyboard(one_time = True)
+            .add(Text('Понедельник', {'cmd': payload}))
+            .add(Text('Вторник', {'cmd': payload}))
+            .row()
+            .add(Text('Среда', {'cmd': payload}))
+            .add(Text('Четверг', {'cmd': payload}))
+            .add(Text('Пятница', {'cmd': payload}))
+            .row()
+            .add(Text('Суббота', {'cmd': payload}))
+            .row()
+            .add(Text('Назад', {'cmd': 'undo_' + tree}), KeyboardButtonColor.PRIMARY)
+            .get_json()
+        )
+    else:
+        raise ValueError('Input correct tree!')
+    
+def cls_menu(tree = 'schedule', mode = 'standart'):
+    
+    if payload := __trees.get(tree)[1]:
+        temp = (
+            Keyboard(one_time = True)
+            .add(Text('1 урок', {'cmd': payload}))
+            .row()
+            .add(Text('2 урок', {'cmd': payload}))
+            .add(Text('3 урок', {'cmd': payload}))
+            .row()
+            .add(Text('4 урок', {'cmd': payload}))
+            .add(Text('5 урок', {'cmd': payload}))
+            .add(Text('6 урок', {'cmd': payload}))
+            .row() 
+        )
+    else:
+        raise ValueError('Input correct tree!')
+
+    if mode == 'standart':
+        temp = (
+            temp
+            .add(Text('Назад', {'cmd': 'undo_'+tree}), KeyboardButtonColor.PRIMARY)
+            .get_json()
+        )
+    elif mode == 'apply':
+        temp = (
+            temp
+            .add(Text('Применить', {'cmd': 'apply_'+tree}), KeyboardButtonColor.POSITIVE)
+            .row()
+            .add(Text('Назад', {'cmd': 'undo_'+tree}), KeyboardButtonColor.PRIMARY)
+            .get_json()
+        )
+    
+    return temp
 
 #undo button
 def undo_button(arg):

@@ -103,7 +103,13 @@ class Users:
     
     def vDel(self, *args):
         if len(args) == 1:
-            del self.__Vars[args[0]]
+            try:
+                del self.__Vars[args[0]]
+            except KeyError:
+                return False
         else:
             for v in args:
-                del self.__Vars[v]
+                try:
+                    del self.__Vars[v]
+                except KeyError:
+                    return False

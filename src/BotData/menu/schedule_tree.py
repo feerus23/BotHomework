@@ -43,9 +43,7 @@ async def schedule_handler(message: Message):
 async def sedit_handler(message: Message):
     await message.answer('Выберите день недели', keyboard=keyboard.sedit_menu())
 
-    if usr[message.peer_id].vGet('sobj'):
-        #usr[message.peer_id].vDel('sobj')
-        pass
+    usr[message.peer_id].vDel('sobj')
     
     await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.SCHEDULE)
 
@@ -61,13 +59,13 @@ async def cws_handler(message: Message):
     await message.answer(tstr)
 
     if schedule.compare():
-        await message.answer('Выберите урок, который хотите изменить.', keyboard=keyboard.cls_menu_apply())
+        await message.answer('Выберите урок, который хотите изменить.', keyboard=keyboard.cls_menu(mode='apply'))
     else:
         await message.answer('Выберите урок, который хотите изменить.', keyboard=keyboard.cls_menu())
 
     await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.CWS)
 
-@bp.on.private_message(state=stateMenu.CWS, payload={'cmd': 'apply'})
+@bp.on.private_message(state=stateMenu.CWS, payload={'cmd': 'apply_schedule'})
 async def apply_schedule_handler(message: Message):
     schedule = usr[message.peer_id].vGet('sobj')
 

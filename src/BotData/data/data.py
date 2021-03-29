@@ -1,7 +1,9 @@
 import sqlite3 as sql
 import toml
+import datetime as dt
 
 cfg = toml.load('config.toml')
+
 tvar = cfg['admins_id']; admin = []
 for _, v in tvar.items(): admin.append(v)
 del tvar
@@ -30,7 +32,7 @@ def checkDatabase():
                 les_6th VARCHAR(128)
             );''', 
             '''CREATE TABLE IF NOT EXISTS homework (
-                day_of_week CHAR(3) NOT NULL PRIMARY KEY,
+                day_of_week INT(1) REFERENCES schedule (day_of_week),
                 date DATE(10) NOT NULL UNIQUE ON CONFLICT REPLACE,
                 les_1st VARCHAR(128),
                 les_2nd VARCHAR(128),
@@ -45,9 +47,7 @@ def checkDatabase():
             )'''
         ]
 
-        for q in query: curs.execute(q)
-
-        con.commit()
+        for q in query: curs.execute(q); con.commit()
 
         return False
     else:
@@ -58,3 +58,39 @@ def isAdmin(perm):
         return True
     else:
         return False
+
+def ipairs(array):
+    counter = 0
+    while len(array) > counter:
+        index, value = counter, array[counter]
+        counter += 1
+        yield index, value
+
+def WeekdayToDate(from_date, search_day):
+    from_day = from_date.isoweekday()
+
+    different_days = search_day - from_day if from_day < search_day else 7 - from_day + search_day
+    return from_date + dt.timedelta(days=different_days)
+
+def eValue2int(array):
+    second_array = []
+
+    for value in array:
+        second_array.append(int(value))
+    
+    return second_array
+
+tfDict = {
+    'Понедельник': 1,
+    'Вторник': 2,
+    'Среда': 3,
+    'Четверг': 4,
+    'Пятница': 5,
+    'Суббота': 6
+}
+
+def tfDowSQL(string):
+    return tfDict.get(string, False)
+
+def tfDowStr(integer):
+    return { v:k for k, v in tfDict.items() }.get(integer, False)
