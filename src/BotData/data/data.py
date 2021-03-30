@@ -72,13 +72,18 @@ def WeekdayToDate(from_date, search_day):
     different_days = search_day - from_day if from_day < search_day else 7 - from_day + search_day
     return from_date + dt.timedelta(days=different_days)
 
-def eValue2int(array):
-    second_array = []
+def eValue2int(array) -> list:
+    second_array = list()
 
     for value in array:
         second_array.append(int(value))
     
     return second_array
+
+def strToDate(array):
+    # pylint: disable=unbalanced-tuple-unpacking
+    a, b, c = eValue2int(array)
+    return a, b, c
 
 tfDict = {
     'Понедельник': 1,

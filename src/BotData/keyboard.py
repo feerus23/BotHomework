@@ -1,7 +1,9 @@
 from vkbottle import Keyboard, Text, Callback, KeyboardButtonColor
 
 __trees = {
-    'schedule': ('cws_menu', 'cls_menu')
+    # 'tree_name': (payload_name_sedit, payload_name_cls)
+    'schedule': ('cws_menu', 'cls_menu'),
+    'homework': ('homework_date_menu', 'hmw_cls_menu')
 }
 
 #main_tree

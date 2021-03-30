@@ -41,6 +41,8 @@ class stateMenu(BaseStateGroup):
 
     #homework_tree
     HOMEWORK = 13
+    CLS_HMWRK = 14
+    OMPKS_HMW = 15
 
 @bp.on.private_message(state=None)
 async def begin_handler(message: Message):  

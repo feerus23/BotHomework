@@ -47,7 +47,7 @@ class Schedule:
             res = self.aRes
         return res
     
-    def __getLesDict(self, days_of_week = None, lessons_numbers = None, from_list = ORIGINAL):
+    def _getLesDict(self, days_of_week = None, lessons_numbers = None, from_list = ORIGINAL):
         if days_of_week is None: days_of_week = self.dow.copy()
         if lessons_numbers is None: lessons_numbers = self.standart.copy()
 
@@ -71,7 +71,7 @@ class Schedule:
         return lessons, days_of_week, lessons_numbers
     
     def getLesson(self, days_of_week = None, lessons_numbers = None, from_list = ORIGINAL) -> str:
-        result, dow, _ = self.__getLesDict(days_of_week, lessons_numbers, from_list)
+        result, dow, _ = self._getLesDict(days_of_week, lessons_numbers, from_list)
 
         string = str()
 
@@ -95,7 +95,6 @@ class Schedule:
         self.aRes[days_of_week][lesson_number] = value
     
     def compare(self, days_of_week = None, lesson_numbers = None):
-        #if len(self.res) != len(self.aRes): return False
         if days_of_week is None: days_of_week = self.dow
         if lesson_numbers is None: lesson_numbers = self.standart
 
@@ -112,6 +111,7 @@ class Schedule:
         return difference
     
     def isEmpty(self):
+        #pylint: disable=unsubscriptable-object, not-an-iterable
         tog = True
 
         for day in self.res:
