@@ -7,6 +7,8 @@ class Schedule:
     'Класс для работы с расписанием'
 
     standart = [ i for i in range(1,7) ]
+    ORIGINAL = ORIGINAL
+    MODIFIED = MODIFIED
         
     def __init__(self, days_of_week):
         'Эээ... Метод инициализации-кун?'
@@ -129,7 +131,7 @@ class Schedule:
         elif mode == 2:
             return self.dow
 
-    def merge(self):
+    def __merge(self):
         cRes, caRes = self.res.copy(), self.aRes.copy()
         result = cRes.copy()
 
@@ -142,7 +144,7 @@ class Schedule:
 
     def save(self, days_of_week = None):
         if days_of_week is None: days_of_week = self.dow
-        values = self.merge()
+        values = self.__merge()
 
         for day in days_of_week:
             query = 'INSERT OR REPLACE INTO schedule VALUES (?, ?, ?, ?, ?, ?, ?)'

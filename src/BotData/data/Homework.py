@@ -1,5 +1,5 @@
 from .data import curs, con, tfDowSQL, tfDowStr, ipairs, WeekdayToDate, strToDate
-from .Schedule import Schedule
+from .Schedule import Schedule, ORIGINAL, MODIFIED
 
 import datetime as dt
 import re
@@ -7,6 +7,8 @@ import re
 class Homework:
 
     def __init__(self, date):
+        'Конструктор класса получается'
+
         self.homework = dict()
         redate = re.findall(r'\d+', date)
         
@@ -31,12 +33,24 @@ class Homework:
         else:
             for i in Schedule.standart:
                 self.homework.update([(i, None)])
+        
+        self.modified_homework = self.homework.copy()
     
-    def getHomework(self, lessons = None, mode = 0):
+    @property
+    def date(self):
+        return self.this
+    
+    @date.setter
+    def date(self, value):
+        self.this = dt.date(value)
+    
+    def getHomework(self, lessons = None, mode = 0, from_dict = ORIGINAL):
         if lessons is None:
             lessons = Schedule.standart
         elif isinstance(lessons, int):
             lessons = [ lessons ]
+
+        dictionary = self.homework if from_dict == ORIGINAL else self.modified_homework
         
         string = str()
         array = list()
@@ -44,7 +58,7 @@ class Homework:
         counter = 0
         for les in lessons:
             counter += 1
-            if lesson := (self.homework).get(les, 'Нет данных'):
+            if lesson := (dictionary).get(les, 'Нет данных'):
                 string += lesson
                 array.append(lesson)
             else:
@@ -81,4 +95,23 @@ class Homework:
         
         return result_string 
     
+    def setHomeTask(self, lesson, task):
+        self.modified_homework.update([(lesson, task)])
+
+    def isDifferent(self):
+        return self.modified_homework != self.homework
     
+    def merge(self):
+        result_dict = self.homework.copy()
+
+        for k, v in self.modified_homework.items():
+            if v != self.homework[k] and v != None:
+                result_dict.update([(k, v)])
+
+        return result_dict
+    
+    def save(self):
+        
+        query = 'INSERT OR REPLACE INTO homework VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        curs.execute(query, [ self.getWeekday(), self.this ] + list(self.merge().values()))
+        con.commit()
