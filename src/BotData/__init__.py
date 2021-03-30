@@ -1,4 +1,4 @@
-from . import menu, data
+from . import menu, data, chat
 
-bps = menu.bps
+bps = menu.bps + chat.bps
 

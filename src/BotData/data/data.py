@@ -11,6 +11,9 @@ del tvar
 con = sql.connect('BotData\\data\\base\\base.sqlite')
 curs = con.cursor()
 
+def saveCFG(cfg):
+    toml.dump(cfg, 'config.toml')
+
 def checkDatabase():
     'Checking database function'
     try:
