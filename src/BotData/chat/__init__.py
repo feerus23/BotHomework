@@ -1,3 +1,3 @@
-from . import invite
+from . import invite, request_task
 
-bps = [ invite.bp ]
+bps = [ invite.bp, request_task.bp ]

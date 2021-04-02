@@ -10,7 +10,7 @@ class Homework:
         'Конструктор класса получается'
 
         self.homework = dict()
-        redate = re.findall(r'\d+', date)
+        redate = re.findall(r'\d+', str(date))
         
         if len(redate) > 0:
             y, m, d = strToDate(redate)

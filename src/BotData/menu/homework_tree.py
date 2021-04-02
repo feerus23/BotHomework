@@ -39,7 +39,7 @@ async def homework_date_handler(message: Message):
         await bp.state_dispenser.set(peer_id=message.peer_id,state=stateMenu.MAIN, payload = {'cmd': 'homework_menu'})
         await homework_handler(message)
     else:
-        usr[message.peer_id].vSet(dow=hmw.getWeekday())
+        await message.answer(hmw.this)
 
         kbrd = (
             ( keyboard.cls_menu('homework') if not hmw.isDifferent() else keyboard.cls_menu('homework', 'apply') ) 

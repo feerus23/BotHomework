@@ -70,6 +70,7 @@ def ipairs(array):
         yield index, value
 
 def WeekdayToDate(from_date, search_day):
+    from_date = from_date.replace(day=from_date.day - 1)
     from_day = from_date.isoweekday()
 
     different_days = search_day - from_day if from_day < search_day else 7 - from_day + search_day

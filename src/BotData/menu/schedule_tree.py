@@ -61,7 +61,7 @@ async def cws_handler(message: Message):
     if schedule.compare():
         await message.answer('Выберите урок, который хотите изменить.', keyboard=keyboard.cls_menu(mode='apply'))
     else:
-        await message.answer('Выберите урок, который хотите изменить.', keyboard=keyboard.cls_menu() if data.data.isAdmin(usr[message.peer_id].pGet(1)) else keyboard.undo_button('schedule'))
+        await message.answer('Выберите урок, который хотите изменить.', keyboard=keyboard.cls_menu())
 
     await bp.state_dispenser.set(peer_id=message.peer_id, state=stateMenu.CWS)
 
