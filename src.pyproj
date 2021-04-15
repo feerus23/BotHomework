@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7d8a32c6-cf91-40a5-a4cb-b7336206dbe5}</ProjectGuid>
+    <ProjectHome>src\</ProjectHome>
+    <StartupFile>__main__.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="body\blueprints\chat_message\__init__.py" />
+    <Compile Include="body\blueprints\private_message\__init__.py" />
+    <Compile Include="body\blueprints\__init__.py" />
+    <Compile Include="body\data\classes\dynamic\database.py" />
+    <Compile Include="body\data\classes\dynamic\diary\homework.py" />
+    <Compile Include="body\data\classes\dynamic\diary\schedule.py" />
+    <Compile Include="body\data\classes\dynamic\diary\__init__.py" />
+    <Compile Include="body\data\classes\dynamic\users.py" />
+    <Compile Include="body\data\classes\dynamic\__init__.py" />
+    <Compile Include="body\data\classes\static\config.py" />
+    <Compile Include="body\data\classes\static\__init__.py" />
+    <Compile Include="body\data\classes\temporary\cache.py" />
+    <Compile Include="body\data\classes\temporary\__init__.py" />
+    <Compile Include="body\data\classes\__init__.py" />
+    <Compile Include="body\data\__init__.py" />
+    <Compile Include="body\__init__.py" />
+    <Compile Include="__main__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="body\data\storages\config.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="body" />
+    <Folder Include="body\blueprints" />
+    <Folder Include="body\blueprints\chat_message" />
+    <Folder Include="body\blueprints\private_message" />
+    <Folder Include="body\data" />
+    <Folder Include="body\data\classes" />
+    <Folder Include="body\data\classes\dynamic" />
+    <Folder Include="body\data\classes\dynamic\diary" />
+    <Folder Include="body\data\classes\static" />
+    <Folder Include="body\data\classes\temporary" />
+    <Folder Include="body\data\storages" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.7" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>
