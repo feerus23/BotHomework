@@ -1,7 +1,7 @@
 {
-  "token": "",
-  "group_id": 1,
+  "token": TOKEN_OF_YOUR_GROUP,
+  "group_id": YOUR_GROUP_ID,
   "dev_ids": [
-    595522259
+    YOUR_ID
   ]
 }
