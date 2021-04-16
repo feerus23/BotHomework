@@ -1,6 +1,0 @@
-# Cache trash files
-__pycache__
-
-# Data files
-src\body\data\storages\config.json
-*.sql
