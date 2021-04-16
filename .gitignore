@@ -3,8 +3,8 @@
 /workspace.xml
 
 # Cache trash dirs
-__pycache__
-.pytest_cache
+/__pycache__/
+/.pytest_cache/
 
 # Data files
 src\body\data\storages\config.json
