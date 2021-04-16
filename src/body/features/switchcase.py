@@ -11,7 +11,6 @@ def switch(cases, switch_type=None):
             for value in cases:
                 yield case(value)
         else:
-            print('stop it')
             yield case(cases)
     else:
         yield case(cases)

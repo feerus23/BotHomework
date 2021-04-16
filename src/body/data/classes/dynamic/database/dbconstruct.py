@@ -1,13 +1,3 @@
-import sqlite3 as sql
-from src.body.data.storages.constants import DATABASE_PATH
-from src.body.features.switchcase import switch
-
-# QUERY TYPES
-CREATE = 0
-INSERT = 1
-DROP = 2
-
-
 class DBConstruct:
     """Парсер для преобразования словарей в SQL запросы. Спрашивается зачем? По приколу."""
     # Properties of class
@@ -22,7 +12,7 @@ class DBConstruct:
         self._parse_dict = value
 
     # Constructors of class
-    def __init__(self, parse_dict=None) -> object:
+    def __init__(self, parse_dict=None):
         """В качестве parse_dict указывать словарь, в документации
         каждого метода указан пример словаря"""
 
@@ -45,8 +35,13 @@ class DBConstruct:
                 if type(v_1) is str:
                     query[-1] += f'{k_1} {v_1}, ' if length < len(v) else f'{k_1} {v_1})'
                 elif type(v_1) is tuple:
+                    length_2: int = 0
+                    query[-1] += f'{k_1} '
+
                     for v_2 in v_1:
-                        query[-1] += f'{v_2} '
+                        length_2 += 1
+
+                        query[-1] += f'{v_2} ' if length_2 < len(v_1) else f'{v_2}'
 
                     query[-1] += ', ' if length < len(v) else ')'
 
@@ -77,54 +72,29 @@ class DBConstruct:
 
         return query, values
 
+    def select(self):
+        """Метод для создания запроса SELECT FROM WHERE (WHERE необяз. параметр)
+        example: { 'table': [ ('column_name', variable), 'VALUE_1', 'VALUE_2' ... 'VALUE_N' ] }
+        0 индекс списка таблицы всегда соотвествует параметру WHERE. Если запрос не
+        должен содержать WHERE, в качестве 0 индекса передавайте None"""
+        query: list = []
+        value: list = []
 
-class Database:
-    """Database class"""
-    # Class properties
-    if True:
-        _connection: sql.Connection
-        _cursor: sql.Cursor
-        _data: list
+        for k, v in self.parse_dict.items():
+            length: int = 0
+            values = str()
+            where = str()
 
-        @property
-        def con(self):
-            return self._connection
+            for v_1 in v:
+                length += 1
 
-        @property
-        def cur(self):
-            return self._cursor
+                if v_1 is not None:
+                    if v.index(v_1) == 0:
+                        where = f' WHERE {v_1[0]} = ?'
+                        value.append(v_1[1])
+                    else:
+                        values += f'{v_1}, ' if length < len(v) else f'{v_1}'
 
-        @property
-        def data(self):
-            return self._data
+            query.append(f'SELECT {values} FROM {k}{where}')
 
-    # Class constructors
-    def __init__(self, path: str):
-        """В качестве параметра принимает путь до БД"""
-        self._connection = sql.connect(path)
-        self._cursor = self.con.cursor()
-
-    def exe_query(self, query_type, query_dict: dict, commit=False) -> None:
-        """Метод выполнения запроса с использованием класса парсера DBConstruct.
-        В качестве аргументов принимает
-        query_type: CREATE, INSERT, DROP (DROP не реализован)
-        query_dict - словарь с данными для парсинга
-        commit - применить изменения сразу иль нет"""
-
-        dbcobj = DBConstruct(query_dict)
-        query = list()
-
-        for case in switch(query_type):
-            if case(CREATE):
-                query = dbcobj.create()
-            elif case(INSERT):
-                query, values = dbcobj.insert()
-
-        for q in query:
-            self._cursor.execute(q)
-
-        if commit:
-            self._connection.commit()
-
-    def commit(self):
-        self._connection.commit()
+        return query, value
