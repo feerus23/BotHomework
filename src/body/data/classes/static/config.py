@@ -1,5 +1,4 @@
 import json
-import os
 from src.body.data.storages.constants import CONFIGURATION_PATH
 
 
